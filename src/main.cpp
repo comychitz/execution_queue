@@ -6,26 +6,6 @@ class ExecutionQueueMsgBase {
     virtual void call() = 0;
 };
 
-template <typename>
-class ExecutionQueueMsg;
-
-template <typename T>
-class ExecutionQueueMsg : public ExecutionQueueMsgBase {
-  T &obj_;
-  void (T::*method_)();
-  
-  public:
-    ExecutionQueueMsg(T &obj, void (T::*method)()) : obj_(obj), method_(method) { 
-    }
-
-    ~ExecutionQueueMsg() {
-    }
-
-    void call() {
-      (obj_.*method_)();
-    }
-};
-
 class Printer {
 
   public:
@@ -39,8 +19,23 @@ class Printer {
       std::cout << "print" << std::endl;
     }
 
-    void printString(std::string &str) {
+    void printString(std::string str) {
       std::cout << str << std::endl;
+    }
+};
+
+template <typename T, class ...Args>
+class ExecutionQueueMsg : public ExecutionQueueMsgBase {
+
+  public:
+    ExecutionQueueMsg(T &obj, void (T::*method)(Args ...), Args ...args) {
+        (obj.*method)(args...);
+    }
+
+    ~ExecutionQueueMsg() {
+    }
+
+    void call() {
     }
 };
 
@@ -50,6 +45,9 @@ int main(int argc, const char *argv[])
   ExecutionQueueMsg<Printer> msg = ExecutionQueueMsg<Printer>(printer, &Printer::print);
   msg.call();
 
+  std::string str = "hi";
+  ExecutionQueueMsg<Printer, std::string> msgWithArg = ExecutionQueueMsg<Printer, std::string>(printer, &Printer::printString, str);
+  msgWithArg.call();
   
   return 0;
 }
