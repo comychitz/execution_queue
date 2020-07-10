@@ -5,7 +5,7 @@ class ExecutionQueueMsgBase {
   public:
     virtual ~ExecutionQueueMsgBase() { }
 
-    virtual void call() = 0;
+    virtual void call() = 0; 
 };
 
 template <typename...>
@@ -13,36 +13,30 @@ class ExecutionQueueMsg;
 
 template <typename T>
 class ExecutionQueueMsg<T> : public ExecutionQueueMsgBase {
-
   T &obj_;
   void (T::*method_)();
 
   public:
-    ExecutionQueueMsg(T &obj, void (T::*method)()) : obj_(obj), method_(method) {
-    }
+    ExecutionQueueMsg(T &obj, void (T::*method)()) : obj_(obj), method_(method) { }
 
-    ~ExecutionQueueMsg() {
-    }
+    ~ExecutionQueueMsg() { }
 
-    void call() {
+    void call() override {
       (obj_.*method_)();
     }
 };
 
 template <typename T, typename P1>
 class ExecutionQueueMsg<T, P1> : public ExecutionQueueMsgBase {
-
   T &obj_;
   void (T::*method_)(P1);
   P1 p1_;
 
   public:
     ExecutionQueueMsg(T &obj, void (T::*method)(P1), P1 p1) 
-      : obj_(obj), method_(method), p1_(p1) {
-    }
+      : obj_(obj), method_(method), p1_(p1) { }
 
-    ~ExecutionQueueMsg() {
-    }
+    ~ExecutionQueueMsg() { }
 
     void call() {
       (obj_.*method_)(p1_);
@@ -51,7 +45,6 @@ class ExecutionQueueMsg<T, P1> : public ExecutionQueueMsgBase {
 
 template <typename T, typename P1, typename P2>
 class ExecutionQueueMsg<T, P1, P2> : public ExecutionQueueMsgBase {
-
   T &obj_;
   void (T::*method_)(P1, P2);
   P1 p1_;
@@ -59,11 +52,9 @@ class ExecutionQueueMsg<T, P1, P2> : public ExecutionQueueMsgBase {
 
   public:
     ExecutionQueueMsg(T &obj, void (T::*method)(P1, P2), P1 p1, P2 p2) 
-      : obj_(obj), method_(method), p1_(p1), p2_(p2) {
-    }
+      : obj_(obj), method_(method), p1_(p1), p2_(p2) { }
 
-    ~ExecutionQueueMsg() {
-    }
+    ~ExecutionQueueMsg() { }
 
     void call() {
       (obj_.*method_)(p1_, p2_);
@@ -72,7 +63,6 @@ class ExecutionQueueMsg<T, P1, P2> : public ExecutionQueueMsgBase {
 
 template <typename T, typename P1, typename P2, typename P3>
 class ExecutionQueueMsg<T, P1, P2, P3> : public ExecutionQueueMsgBase {
-
   T &obj_;
   void (T::*method_)(P1, P2, P3);
   P1 p1_;
@@ -81,11 +71,9 @@ class ExecutionQueueMsg<T, P1, P2, P3> : public ExecutionQueueMsgBase {
 
   public:
     ExecutionQueueMsg(T &obj, void (T::*method)(P1, P2, P3), P1 p1, P2 p2, P3 p3) 
-      : obj_(obj), method_(method), p1_(p1), p2_(p2), p3_(p3) {
-    }
+      : obj_(obj), method_(method), p1_(p1), p2_(p2), p3_(p3) { }
 
-    ~ExecutionQueueMsg() {
-    }
+    ~ExecutionQueueMsg() { }
 
     void call() {
       (obj_.*method_)(p1_, p2_, p3_);
@@ -94,7 +82,6 @@ class ExecutionQueueMsg<T, P1, P2, P3> : public ExecutionQueueMsgBase {
 
 template <typename T, typename P1, typename P2, typename P3, typename P4>
 class ExecutionQueueMsg<T, P1, P2, P3, P4> : public ExecutionQueueMsgBase {
-
   T &obj_;
   void (T::*method_)(P1, P2, P3, P4);
   P1 p1_;
@@ -104,11 +91,9 @@ class ExecutionQueueMsg<T, P1, P2, P3, P4> : public ExecutionQueueMsgBase {
 
   public:
     ExecutionQueueMsg(T &obj, void (T::*method)(P1, P2, P3, P4), P1 p1, P2 p2, P3 p3, P4 p4) 
-      : obj_(obj), method_(method), p1_(p1), p2_(p2), p3_(p3), p4_(p4) {
-    }
+      : obj_(obj), method_(method), p1_(p1), p2_(p2), p3_(p3), p4_(p4) { }
 
-    ~ExecutionQueueMsg() {
-    }
+    ~ExecutionQueueMsg() { }
 
     void call() {
       (obj_.*method_)(p1_, p2_, p3_, p4_);
@@ -128,11 +113,9 @@ class ExecutionQueueMsg<T, P1, P2, P3, P4, P5> : public ExecutionQueueMsgBase {
 
   public:
     ExecutionQueueMsg(T &obj, void (T::*method)(P1, P2, P3, P4, P5), P1 p1, P2 p2, P3 p3, P4 p4, P5 p5) 
-      : obj_(obj), method_(method), p1_(p1), p2_(p2), p3_(p3), p4_(p4), p5_(p5) {
-    }
+      : obj_(obj), method_(method), p1_(p1), p2_(p2), p3_(p3), p4_(p4), p5_(p5) { }
 
-    ~ExecutionQueueMsg() {
-    }
+    ~ExecutionQueueMsg() { }
 
     void call() {
       (obj_.*method_)(p1_, p2_, p3_, p4_, p5_);
