@@ -6,18 +6,38 @@
 #include <mutex>
 #include <condition_variable>
 
-#include <iostream>
-
 class ExecutionQueue {
   public:
     ExecutionQueue();
 
     ~ExecutionQueue();
 
+    /**
+     * process one message on the execution queue. if queue is empty, block
+     * until interrupted or a message arrives.
+     * @returns 0 on success, 1 if interrupted, -1 on error
+     */
     int process();
 
+    /**
+     * interrupt the execution queue if it's blocked waiting for messages.
+     */
     void interrupt();
 
+    /**
+     * clear the queue
+     */
+    void clear();
+
+    /**
+     * check if the queue is empty
+     * @returns true if empty, false otherwise
+     */
+    bool empty();
+
+    /**
+     * enqueue an object's method (with params) onto the execution queue.
+     */
     template <typename T>
     void enqueue(void (T::*method)(), T &obj);
 
@@ -73,6 +93,17 @@ int ExecutionQueue::process() {
 void ExecutionQueue::interrupt() {
   std::unique_lock<std::mutex> lock(lock_);
   cond_.notify_one();
+}
+
+void ExecutionQueue::clear() {
+  std::unique_lock<std::mutex> lock(lock_);
+  while (!q_.empty()) {
+    q_.pop();
+  }
+}
+
+bool ExecutionQueue::empty() {
+  return q_.empty();
 }
 
 void ExecutionQueue::enqueue_(ExecutionQueueMsgBase *msg) {

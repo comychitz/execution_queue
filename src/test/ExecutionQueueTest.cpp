@@ -20,12 +20,6 @@ class Printer {
 
 ExecutionQueue q;
 
-void interruptQueue() {
-  sleep(3);
-  q.interrupt();
-  std::cout << "interrupted queue" << std::endl;
-}
-
 TEST_CASE("enqueue method with diff num of params", "[exec queue]") {
   Printer printer = Printer();
   q.enqueue(&Printer::print, printer);
@@ -43,8 +37,14 @@ TEST_CASE("enqueue method with diff num of params", "[exec queue]") {
   q.process();
 }
 
+void delayedQueueInterrupt() {
+  sleep(3);
+  q.interrupt();
+  std::cout << "interrupted queue" << std::endl;
+}
+
 TEST_CASE("empty queue blocks on process, returns when interrupted", "[exec queue]") {
-  std::thread t1(interruptQueue);
+  std::thread t1(delayedQueueInterrupt);
   int ret = q.process();
   t1.join();
   REQUIRE(ret == 1);
