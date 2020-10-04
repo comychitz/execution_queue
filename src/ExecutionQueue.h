@@ -4,6 +4,7 @@
 #include "ExecutionQueueMsg.h"
 #include <queue>
 #include <mutex>
+#include <chrono>
 #include <condition_variable>
 
 class ExecutionQueue {
@@ -18,6 +19,13 @@ class ExecutionQueue {
      * @returns 0 on success, 1 if interrupted, -1 on error
      */
     int process();
+
+    /**
+     * process one message on the execution queue. if queue is empty, block
+     * until interrupted, timed-out (seconds) or a message arrives.
+     * @returns 0 on success, 1 if interrupted, 2 if timed-out, -1 on error
+     */
+    int process(int timeout);
 
     /**
      * interrupt the execution queue if it's blocked waiting for messages.
@@ -76,6 +84,26 @@ int ExecutionQueue::process() {
   std::unique_lock<std::mutex> lock(lock_);
   if (q_.empty()) {
     cond_.wait(lock);
+    if (q_.empty()) {
+      return 1;
+    }
+  }
+
+  if (!q_.empty()) {
+    ExecutionQueueMsgBase *msg = q_.front();
+    msg->call();
+    q_.pop();
+    delete msg;
+  }
+  return 0;
+}
+
+int ExecutionQueue::process(int timeout) {
+  std::unique_lock<std::mutex> lock(lock_);
+  if (q_.empty()) {
+    if (cond_.wait_for(lock, std::chrono::seconds(timeout)) == std::cv_status::timeout) {
+      return 2;
+    }
     if (q_.empty()) {
       return 1;
     }
